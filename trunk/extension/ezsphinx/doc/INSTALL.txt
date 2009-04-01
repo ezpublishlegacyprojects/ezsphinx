@@ -1,0 +1,67 @@
+Author
+======
+(C) 2009 JSC Coral solutions
+Remigijus Kiminas
+
+Description
+===========
+Contains a Sphinx powered search engine installation instruction.
+
+Installation on eZ publish side
+============
+1. Unpack the extension under the "extension" directory of your eZ publish
+installation.
+
+2. Generate autoloads
+
+3. Add the extension ezsphinx in (/setup/extensions) or edit your
+site.ini.append.php file and add:
+
+[ExtensionSettings]
+ActiveExtensions[]=ezsphinx
+
+[SearchSettings]
+SearchEngine=eZSphinx
+ExtensionDirectories[]=ezsphinx 
+SearchViewHandling=template
+   
+4. Login to administration and clear cache
+
+3. Install new index tables. You can do it throught phpmyadmin. 
+doc/ezsphinx.sql
+
+4. Updating search index.
+php  ./bin/php/updatesearchindex.php --clean
+
+Installation on sphinx side.
+============
+1. Make appropriate changes to your sphinx.conf configuration. Demo configuration in doc/sphinx.demo.conf
+
+2. After setup execute to update create new index
+/usr/local/bin/indexer --config /usr/local/etc/sphinx.conf --all
+
+3. Setup cronjob for regular index updates. Every five minits
+/usr/local/bin/indexer --rotate --config /usr/local/etc/sphinx.conf ezsphinxdelta
+
+4. you can also setup this cronjob, it will delete deleted indexes while merging. Once a week perhaps.
+Currently i did not understand, but if i merge marked is_deleted indexes they appear anywai... What I'm missing ?
+So now i just suggest after restarting searchd deamon just reindall all with
+/usr/local/bin/indexer --rotate --config /usr/local/etc/sphinx.conf --all
+
+Not quet working command for mergin indexes, perhaps I'm missing something..
+/usr/local/bin/indexer --rotate --config /usr/local/etc/sphinx.conf --merge ezsphinx ezsphinxdelta --merge-dst-range is_deleted 0 0
+
+5. Starting service command example
+Starting service example.
+/usr/local/bin/searchd --config /usr/local/etc/sphinx.conf
+
+6. Example of searching car
+/usr/local/bin/search -q --config /usr/local/etc/sphinx.conf  "car"
+
+
+Requirements
+============
+
+eZ publish 4+.
+Sphinx 9.8.x
+Tested with 9.8.1 version, should work with 9.9.x Sphinx version..
